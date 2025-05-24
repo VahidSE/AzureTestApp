@@ -1,20 +1,23 @@
-﻿@page "/purse/{id:int}"
-@using AzureTestApp.Services
-@inject ExpensesService expensesService
-<h3>My Purse</h3><hr/>
+﻿@page "/purse/{action:int}/{record:int}"
+@*--It defines page/component rounte--*@
 
-@if(@isSuccess)
+@inject ExpensesService expensesService
+
+<h3>My Purse</h3>
+<hr />
+
+@if (@isSuccess)
 {
-<div>
-    <p style="color:forestgreen">Transaction recorded successfully.!</p>
-</div>
+    <div>
+        <p style="color:forestgreen">Transaction recorded successfully.!</p>
+    </div>
 }
 
 <EditForm Model="@formData" FormName="ExpensesForm" OnSubmit="HandleSubmit">
     <div class="row">
         <div class="col-md-3"><label>Name:</label></div>
         <div class="col-md-6">
-            <InputText @bind-Value="formData.Name"/>
+            <InputText @bind-Value="formData.Name" />
         </div>
     </div>
     <div class="row">
@@ -30,27 +33,24 @@
     <div class="row">
         <div class="col-md-3"><label>Catageory:</label></div>
         <div class="col-md-6">
-        <InputSelect @bind-Value="formData.Catageory">
-            <option value="">-- select a catageory</option>
-            <option value="EMI">EMI</option>
-            <option value="House">House</option>
-            <option value="Transport">Transport</option>
-            <option value="SuperMarket">Super market</option>
-            <option value="Online">Shopping online</option>
-            <option value="Subscriptions">Recharge | Subscriptions</option>
-            <option value="CreditCard">Credit card</option>
-            <option value="Rice">Rice</option>
-            <option value="Others">Others</option>
-        </InputSelect>
+            <InputSelect @bind-Value="formData.Catageory">
+                <option value="">-- select a catageory --</option>
+                @foreach (var catageory in catDict)
+                {
+                    <option value="@catageory.Key">@catageory.Value</option>
+                }
+            </InputSelect>
         </div>
     </div>
     <div class="row">
         <div class="col-md-3"><label>Type:</label></div>
         <div class="col-md-6">
             <InputSelect @bind-Value="formData.TransactionType">
-                <option value="">-- select type</option>
-                <option value="Debited" selected>Debited</option>
-                <option value="Credited">Credited</option>               
+                <option value="">-- select type --</option>
+                @foreach (var tType in TxTypeDict)
+                {
+                    <option value="@tType.Key">@tType.Value</option>
+                }
             </InputSelect>
         </div>
     </div>
@@ -58,30 +58,76 @@
         <div class="col-md-3"><label>Description:</label></div>
         <div class="col-md-6"><InputTextArea @bind-Value="formData.Description" /></div>
     </div>
-    
-    <button class="btn btn-primary" type="submit">Submit</button>
+
+    <button class="@GetButtonClass(Action)" type="submit">@actionType</button>
 </EditForm>
 
 @code {
     [SupplyParameterFromForm]
-    public Expenses formData { get; set; } = new ();
+    public Expenses formData { get; set; } = new();
 
     [Parameter]
-    public int Id { get; set; }
+    public int Action { get; set; } //0-Submit, 1- Update, 2-Delete
 
-    protected async override Task OnInitializedAsync()
+    [Parameter]
+    public int Record { get; set; }
+
+    Dictionary<string, string> catDict = new Dictionary<string, string>();
+    Dictionary<string, string> TxTypeDict = new Dictionary<string, string>();
+    public string actionType = "Submit";
+
+    protected override async Task OnInitializedAsync()
     {
-        if (Id != 0)
+        catDict = expensesService.GetCatageories();
+        TxTypeDict = expensesService.GetTransactionType();
+        if (Action == 1)
+            actionType = "Update";
+        if (Action == 2)
+            actionType = "Delete";
+
+        if (Record != 0 && formData.Id == 0 && formData.Catageory == null 
+            && formData.Description == null && formData.TransactionType == null && formData.Name == null)
         {
-            var result = await expensesService.GetTransactionbyId(Id);
+            var result = await expensesService.GetTransactionbyId(Record);
             formData = result;
+        }
+    }
+
+    private string GetButtonClass(int _action)
+    {
+        if (_action == 0)
+        {
+            return "btn btn-primary";
+        }
+        else if (_action == 1)
+        {
+            return "btn btn-secondary";
+        }
+        else if (_action == 2)
+        {
+            return "btn btn-danger";
+        }
+        else
+        {
+            return "btn btn-primary";
         }
     }
 
     bool isSuccess = false;
     public async Task HandleSubmit()
     {
-        await expensesService.AddTransaction(formData);
+        if (Action == 0) //create
+        {
+            await expensesService.AddTransaction(formData);
+        }
+        else if (Action == 1) //Update
+        {
+            await expensesService.UpdateTransaction(Record, formData);
+        }
+        else if (Action == 2) //Delete
+        {
+            await expensesService.DeleteTransaction(Record);
+        }
         formData = new Expenses();
         isSuccess = true;
     }

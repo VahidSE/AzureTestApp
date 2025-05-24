@@ -62,9 +62,8 @@
     {
         yearsList = expService.GetYears();
         monthDict = expService.GetMonths();
-        //expenseList = expService.GetAllTransactionsByMonth(DateTime.Now.Month, DateTime.Now.Year);
-        expenseList = await expService.GetAllTransactionsByMonth(DateTime.Now.Month - 1, DateTime.Now.Year);
-        TotalMoneySpent = await expService.GetTotalByMonth(DateTime.Now.Month-1, DateTime.Now.Year);
+        expenseList = await expService.GetAllTransactionsByMonth(DateTime.Now.Month, DateTime.Now.Year);
+        TotalMoneySpent = await expService.GetTotalByMonth(DateTime.Now.Month, DateTime.Now.Year);
         catAmounts = await expService.GetByCatageory(DateTime.Now.Month, DateTime.Now.Year);
     }
 

@@ -58,9 +58,7 @@
                         <td>@trans.Description</td>
                         <td>@trans.TransactionType</td>
                         <td>@trans.Amount</td>
-                        <td><a style="color:green" href="/purse/@trans.Id">Edit</a></td>
-                        <td><button type="button" @onclick="() => DeleteItem(trans.Id)">Delete</button></td>
-                        <td><button type="button" @onclick="() => DeleteItem2()">Delete</button></td>
+                        <td><a style="color:green" href="/purse/1/@trans.Id">Edit</a> | <a style="color:red" href="/purse/2/@trans.Id">Delete</a> </td>
                     </tr>
                 }
             </tbody>
@@ -79,15 +77,4 @@
 
     [Parameter]
     public List<CatageoryAmount> catageoryAmounts { get; set; } = new();
-
-    public async Task DeleteItem(int id)
-    {
-        await expensesService.DeleteTransaction(id);
-
-    }
-
-    public void DeleteItem2()
-    {
-        
-    }
 }
