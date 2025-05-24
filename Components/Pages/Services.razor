@@ -1,0 +1,38 @@
+﻿@page "/services/{id}"
+@inject ProfileData _profileData
+<h3>Services</h3>
+
+<p>Service ID: @Id</p>
+
+@foreach (var carditem in cards)
+{
+    <div>
+        <ul>
+            <li>
+                @carditem.Id + "-" +  @carditem.Name
+            </li>
+            <li>
+                @carditem.PhoneNumber
+            </li>
+            <li>
+                @carditem.ServiceOffering
+            </li>
+            <li>
+                @carditem.Description
+            </li>
+        </ul>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    List<ProfileCard> cards = new List<ProfileCard>();
+
+    protected override void OnInitialized()
+    {
+        cards = _profileData.GetCards().Where(x => x.ServiceOffering == Convert.ToString(Id)).ToList();
+       
+    }
+    }

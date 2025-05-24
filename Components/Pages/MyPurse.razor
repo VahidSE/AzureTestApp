@@ -1,0 +1,88 @@
+﻿@page "/purse/{id:int}"
+@using AzureTestApp.Services
+@inject ExpensesService expensesService
+<h3>My Purse</h3><hr/>
+
+@if(@isSuccess)
+{
+<div>
+    <p style="color:forestgreen">Transaction recorded successfully.!</p>
+</div>
+}
+
+<EditForm Model="@formData" FormName="ExpensesForm" OnSubmit="HandleSubmit">
+    <div class="row">
+        <div class="col-md-3"><label>Name:</label></div>
+        <div class="col-md-6">
+            <InputText @bind-Value="formData.Name"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3"><label>Date:</label></div>
+        <div class="col-md-6">
+            <InputDate @bind-Value="formData.DayOfTransaction" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3"> <label>Amount:</label></div>
+        <div class="col-md-6"><InputNumber @bind-Value="formData.Amount" /></div>
+    </div>
+    <div class="row">
+        <div class="col-md-3"><label>Catageory:</label></div>
+        <div class="col-md-6">
+        <InputSelect @bind-Value="formData.Catageory">
+            <option value="">-- select a catageory</option>
+            <option value="EMI">EMI</option>
+            <option value="House">House</option>
+            <option value="Transport">Transport</option>
+            <option value="SuperMarket">Super market</option>
+            <option value="Online">Shopping online</option>
+            <option value="Subscriptions">Recharge | Subscriptions</option>
+            <option value="CreditCard">Credit card</option>
+            <option value="Rice">Rice</option>
+            <option value="Others">Others</option>
+        </InputSelect>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3"><label>Type:</label></div>
+        <div class="col-md-6">
+            <InputSelect @bind-Value="formData.TransactionType">
+                <option value="">-- select type</option>
+                <option value="Debited" selected>Debited</option>
+                <option value="Credited">Credited</option>               
+            </InputSelect>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3"><label>Description:</label></div>
+        <div class="col-md-6"><InputTextArea @bind-Value="formData.Description" /></div>
+    </div>
+    
+    <button class="btn btn-primary" type="submit">Submit</button>
+</EditForm>
+
+@code {
+    [SupplyParameterFromForm]
+    public Expenses formData { get; set; } = new ();
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        if (Id != 0)
+        {
+            var result = await expensesService.GetTransactionbyId(Id);
+            formData = result;
+        }
+    }
+
+    bool isSuccess = false;
+    public async Task HandleSubmit()
+    {
+        await expensesService.AddTransaction(formData);
+        formData = new Expenses();
+        isSuccess = true;
+    }
+}

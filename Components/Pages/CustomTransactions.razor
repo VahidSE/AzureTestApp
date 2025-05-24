@@ -1,0 +1,93 @@
+﻿@page "/"
+@using AzureTestApp.Services
+@inject ExpensesService expService
+
+<h3>Dashboard</h3>
+<hr/>
+<div class="tile-container2">
+    <div class="tile2">
+<EditForm Model="@formData" FormName="SomeSearchForm" OnValidSubmit="HandleSearch">
+<div class="row">
+<div class="col-md-4">
+    <label>Select Month : </label>
+<InputSelect @bind-Value="formData.MonthFilter">
+   @foreach(var mon in monthDict)
+   {
+    <option value="@mon.Key">@mon.Value</option>
+   }
+    
+</InputSelect>
+ </div>
+
+ <div class="col-md-4">
+            <label>Select Year :</label>
+            <InputSelect @bind-Value="formData.YearFilter">
+                @foreach (var year in yearsList)
+                {
+                    <option value="@year">@year</option>
+                }
+            </InputSelect>
+ </div>
+
+ <div class="col-md-4">
+     <button type="submit" class="btn btn-primary">Search</button>
+ </div>
+
+ </div>
+
+</EditForm>
+</div>
+</div>
+
+<br/>
+
+<div class="tile-container2">
+    <div class="tile2">
+        <Transactions expenses="@expenseList" TotalMoneySpent="@TotalMoneySpent" catageoryAmounts="@catAmounts"></Transactions>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    public Filter formData { get; set; } = new();
+
+    List<int> yearsList = new List<int>();
+    Dictionary<int, string> monthDict = new Dictionary<int, string>(); 
+    List<Expenses> expenseList = new List<Expenses>();
+    double TotalMoneySpent = 0;
+    List<CatageoryAmount> catAmounts = new List<CatageoryAmount>();
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        yearsList = expService.GetYears();
+        monthDict = expService.GetMonths();
+        //expenseList = expService.GetAllTransactionsByMonth(DateTime.Now.Month, DateTime.Now.Year);
+        expenseList = await expService.GetAllTransactionsByMonth(DateTime.Now.Month - 1, DateTime.Now.Year);
+        TotalMoneySpent = await expService.GetTotalByMonth(DateTime.Now.Month-1, DateTime.Now.Year);
+        catAmounts = await expService.GetByCatageory(DateTime.Now.Month, DateTime.Now.Year);
+    }
+
+    public async Task HandleSearch()
+    {
+        var data = formData;
+        expenseList = await expService.GetAllTransactionsByMonth(formData.MonthFilter, formData.YearFilter);
+        TotalMoneySpent = await expService.GetTotalByMonth(formData.MonthFilter,formData.YearFilter);
+        catAmounts = await expService.GetByCatageory(formData.MonthFilter, formData.YearFilter);
+    }
+}
+
+<style>
+    .tile-container2 {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr); /* Three equal columns */
+        gap: 10px;
+    }
+
+    .tile2 {
+        padding: 20px;
+        background: #f5f5f5;
+        border-radius: 8px;
+        box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+    }
+</style>

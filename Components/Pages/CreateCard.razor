@@ -1,0 +1,61 @@
+﻿@page "/createcard"
+@inject ProfileData pdService
+<h3>CreateCard</h3>
+<span>@message</span>
+
+<EditForm Model="@formData" FormName="CreateCardForm" OnValidSubmit="HandleSubmit">
+    
+    <div>
+        <label>Name:</label>
+        <InputText @bind-Value="@formData.Name"/>
+    </div>
+    <div>
+        <label>Phone Number:</label>
+        <InputText @bind-Value="@formData.PhoneNumber" />
+    </div>
+    <div>
+        <label>Description:</label>
+        <InputTextArea @bind-Value="@formData.Description" />
+    </div>
+    <div>
+        <label>Service Offering:</label>
+        <InputText @bind-Value="@formData.ServiceOffering" />
+    </div>
+    <InputSelect @bind-Value="@formData.ServiceOffering" on>
+        <option value="">-- select a service</option>
+        @foreach (var category in ddValues)
+        {
+            <optgroup label="@category.Key">
+                @foreach (var item in category.Value)
+                {
+                    <option value="@item.Key">@item.Value</option>
+                }
+            </optgroup>
+        }
+       @*  @foreach (var da in ddServices)
+        {
+            <option value="@da">@da</option>
+        } *@
+    </InputSelect>
+    <button type="submit">Submit</button>
+ 
+</EditForm>
+
+@code {
+    private string message = "Message Here...";
+    private ProfileCard formData = new ProfileCard();
+    Dictionary<string, Dictionary<string, string>> ddValues = new Dictionary<string, Dictionary<string, string>>();
+
+
+    protected override void OnInitialized()
+    {
+        ddValues = pdService.GetDropDownValues();
+    }
+
+    private void HandleSubmit()
+    {
+        message = "Data Submitted: User is " + formData.Name + ", number is: " + formData.PhoneNumber + ", service description: " + formData.Description + "-" + formData.ServiceOffering;
+        // Reset the form data after submission
+        //formData = new ProfileCard();
+    }
+}

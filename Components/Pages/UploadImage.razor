@@ -1,0 +1,35 @@
+﻿@page "/uploadimage"
+@rendermode InteractiveServer
+
+@inject BlobTestService blobTestService
+
+<h3>UploadImage</h3>
+
+<InputFile OnChange="SendFileToAzure"></InputFile>
+
+<p>@uploadMessage</p>
+@code {
+    private string uploadMessage;
+    private async Task HandleFiles(ChangeEventArgs e)
+    {
+        var file = ((IBrowserFile)e.Value).OpenReadStream();
+        var fileName = ((IBrowserFile)e.Value).Name;
+        await blobTestService.UploadImagesAsync(fileName);
+        uploadMessage = $"{fileName} uploaded successfully.!";
+    }
+
+    private async Task SendFileToAzure(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            var file = e.File.OpenReadStream(long.MaxValue);
+            var fileName = e.File.Name;
+            await blobTestService.UploadImagesAsync(fileName, file);
+            uploadMessage = $"{fileName} uploaded successfully.!";
+        }
+        catch (Exception ex)
+        {
+            uploadMessage = $"Error {ex.Message}";
+        }
+    }
+}

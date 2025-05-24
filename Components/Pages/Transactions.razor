@@ -1,0 +1,93 @@
+﻿@using AzureTestApp.Services
+@inject ExpensesService expensesService
+
+<div class="row">
+    <div class="col-md-6">
+        <p>Amount Spent : <b style="font:large; color:blue">@TotalMoneySpent</b> INR/- </p>
+    </div>
+    <div class="col-md-6">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Catageory</th>
+                    <th>Amount (INR)</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var dataGroup in catageoryAmounts)
+                {
+                    <tr>
+                        <td>@dataGroup.Catageory</td>
+                        <td>@dataGroup.TotalAmount</td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<h3>Transactions</h3>
+<div>
+    @if (expenses == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Catageory</th>
+                    <th>Description</th>
+                    <th>Type</th>
+                    <th>Amount (INR)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var trans in expenses)
+                {
+                    <tr>
+                        <td>@trans.DayOfTransaction.ToShortDateString()</td>
+                        <td>@trans.Catageory</td>
+                        <td>@trans.Description</td>
+                        <td>@trans.TransactionType</td>
+                        <td>@trans.Amount</td>
+                        <td><a style="color:green" href="/purse/@trans.Id">Edit</a></td>
+                        <td><button type="button" @onclick="() => DeleteItem(trans.Id)">Delete</button></td>
+                        <td><button type="button" @onclick="() => DeleteItem2()">Delete</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+</div>
+
+@code {
+
+    [Parameter]
+    public List<Expenses> expenses { get; set; } = new();
+
+    [Parameter]
+    public double TotalMoneySpent { get; set; } = 0;
+
+    [Parameter]
+    public List<CatageoryAmount> catageoryAmounts { get; set; } = new();
+
+    public async Task DeleteItem(int id)
+    {
+        await expensesService.DeleteTransaction(id);
+
+    }
+
+    public void DeleteItem2()
+    {
+        
+    }
+}

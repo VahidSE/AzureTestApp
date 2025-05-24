@@ -1,0 +1,29 @@
+﻿@page "/gallery"
+@inject BlobTestService blobTestServer
+
+<h3>Gallery</h3>
+
+@if (imageUrls == null)
+{
+    <p>Loading images...</p>
+}
+else
+{
+    <div>
+        @foreach (var url in imageUrls)
+        {
+            <img src="@url" alt="Image from Blob Storage" style="width:200px;height:250px;" />
+        }
+    </div>
+}
+
+
+@code {
+    private List<string> imageUrls;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        imageUrls = await blobTestServer.GetImageUrlsAsync();
+    }
+
+}

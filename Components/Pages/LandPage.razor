@@ -1,0 +1,52 @@
+﻿@inject LandingPageServic lpService
+@page "/landpage"
+
+<h4>Installation Or Repair Services</h4>
+<hr/>
+<TileList Items="_tiles.InstallationOrRepairServiceTiles"></TileList>
+
+<h4>House Services</h4>
+<hr />
+<TileList Items="_tiles.HouseServicesTiles"></TileList>
+
+<h4>Travel Services</h4>
+<hr />
+<TileList Items="_tiles.TravelServiceTiles"></TileList>
+
+<h4>Finance Services</h4>
+<hr />
+<TileList Items="_tiles.FinanceServiceTiles"></TileList>
+
+<h4>Education Services</h4>
+<hr />
+<TileList Items="_tiles.EduServiceTiles"></TileList>
+
+<h4>Wedding and Functions Services</h4>
+<hr />
+<TileList Items="_tiles.WedFuncServiceTiles"></TileList>
+
+<h4>Software Services</h4>
+<hr />
+<TileList Items="_tiles.SoftwareServiceTiles"></TileList>
+
+<h4>Wellbeing Services</h4>
+<hr />
+<TileList Items="_tiles.WellbeingServiceTiles"></TileList>
+
+<h4>Hospital Services</h4>
+<hr />
+<TileList Items="_tiles.HospitalServiceTiles"></TileList>
+
+<h4>Other Services</h4>
+<hr />
+<TileList Items="_tiles.OtherServiceTiles"></TileList>
+
+@code {
+    CatTile _tiles = new CatTile();
+    protected override void OnInitialized()
+    {
+        _tiles = lpService.GetAllServices();
+    }
+}
+
+

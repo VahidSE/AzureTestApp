@@ -1,0 +1,15 @@
+﻿@code {
+    [Parameter] public List<Tile> Items { get; set; } = new();
+}
+
+<div class="tile-grid">
+    @foreach (var tile in Items)
+    {
+        <NavLink class="tile" href="@tile.Link">
+            <div class="tile-content">
+                <h3>@tile.Title</h3>
+                <p>@tile.Description</p>
+            </div>
+        </NavLink>
+    }
+</div>
