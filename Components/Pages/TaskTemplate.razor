@@ -1,0 +1,90 @@
+﻿@page "/Task"
+@rendermode InteractiveServer
+@inject NotesService notesService
+
+<h3>Task Manager</h3>
+
+<div class="container mt-4">
+    @* <h2 class="text-center mb-4">Task Manager</h2> *@
+    <div class="mb-3">
+        <input type="text" class="form-control" @bind="newTaskTitle" placeholder="Enter task...">
+        <button class="btn btn-primary mt-2" @onclick="() => AddTask()">Add Task</button>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <h4 class="text-center">All Tasks</h4>
+            <div class="list-group">
+                @foreach (var task in tasks.Where(t => t.TaskStatus == "All"@* Models.TaskStatus.All *@))
+                {
+                    <div class="list-group-item d-flex align-items-center">
+                        <input type="checkbox" class="me-2" @onclick="() => UpdateTaskStatus(task)">
+                        @task.TaskName
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <h4 class="text-center">In Progress Tasks</h4>
+            <div class="list-group">
+                @foreach (var task in tasks.Where(t => t.TaskStatus == "InProgress"@* Models.TaskStatus.All *@))
+                {
+                    <div class="list-group-item d-flex align-items-center">
+                        <input type="checkbox" class="me-2" @onclick="() => UpdateTaskStatus(task)">
+                        @task.TaskName
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <h4 class="text-center">Completed Tasks</h4>
+            <div class="list-group">
+                @foreach (var task in tasks.Where(t => t.TaskStatus == "Completed"@* Models.TaskStatus.All *@))
+                {
+                    <div class="list-group-item text-success fw-bold">
+                        @task.TaskName
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private List<Notes> tasks = new();
+    private string newTaskTitle = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        tasks = await notesService.GetAllNotes();
+    }
+
+    private async Task AddTask()
+    {
+        if (!string.IsNullOrWhiteSpace(newTaskTitle))
+        {
+
+            Notes item = new Notes {TaskName = newTaskTitle, TaskStatus = "All" };
+            await notesService.AddNotes(item);
+            tasks.Add(new Notes {Id= tasks.Count+1, TaskName = newTaskTitle, TaskStatus = "All" });
+        }
+    }
+
+    private async Task UpdateTaskStatus(Notes task)
+    {
+        if (task.TaskStatus == "All")
+        {
+            task.TaskStatus = "InProgress";
+            await notesService.updateNotes(task.Id, task);
+        }
+        else if (task.TaskStatus == "InProgress")
+        {
+            task.TaskStatus = "Completed";
+            await notesService.updateNotes(task.Id, task);
+        }
+    }
+}
+

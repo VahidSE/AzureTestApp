@@ -15,6 +15,7 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(buil
 builder.Services.AddSingleton<BlobTestService>();
 builder.Services.AddSingleton<LandingPageServic>();
 builder.Services.AddScoped<ExpensesService>();
+builder.Services.AddScoped<NotesService>();
 builder.Services.AddSingleton<ProfileData>();
 var app = builder.Build();
 
