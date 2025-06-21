@@ -17,6 +17,7 @@ builder.Services.AddSingleton<LandingPageServic>();
 builder.Services.AddScoped<ExpensesService>();
 builder.Services.AddScoped<NotesService>();
 builder.Services.AddSingleton<ProfileData>();
+builder.Services.AddScoped<HabitService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

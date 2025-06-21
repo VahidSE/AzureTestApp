@@ -1,0 +1,128 @@
+﻿@page "/habit"
+@rendermode InteractiveServer
+@inject HabitService habitService
+
+<h4>
+    Habits - @DateTime.Now.ToString("MMMM")
+</h4>
+<hr/>
+<div>
+    <input type="text" @bind="newHabit" /> <input type="button" @onclick="() => AddHabit()" value="Add new habit">
+</div>
+
+<hr/>
+
+@if (listOfHabits != null)
+{
+    
+    @foreach (var hl in listOfHabits)
+    {
+        <div>
+        <div>
+             @hl.HabitType
+        </div>
+                @foreach (int day in days)
+                {
+                var habitCheck = Habits.Where(da => da.HabitType == @hl.HabitType
+                && da.Date.Day == day
+                && da.Date.Year == DateTime.Today.Year
+                && da.Date.Month == DateTime.Today.Month).FirstOrDefault();
+                
+
+                if (habitCheck != null)
+                {
+                    //For already saved files
+                    <span class="badge rounded-pill text-dark @(habitCheck.IsCompleted ? "bg-success" : "bg-light") me-1 mb-1">
+
+                        @day <input type="checkbox" class="form-check-input ms-1"
+                                    checked="@habitCheck.IsCompleted"
+                                    @onchange="(e) => UpdateHabit(habitCheck.Id, (bool)e.Value)" />
+                    </span>
+                }
+                else
+                {
+                    //For new fields
+                    <span class="badge rounded-pill text-dark bg-light me-1 mb-1">
+                        @day <input type="checkbox" class="form-check-input ms-1"
+                                    checked="@false"
+                                    @onchange="(e) => HabitLog(hl.Id, day, (bool)e.Value)" /> 
+                    </span>
+                }
+            }
+        </div>
+        <hr/>
+    }
+}
+
+@code {
+
+    private static int daysInMonth = DateTime.DaysInMonth(DateTime.Today.Year, DateTime.Today.Month);
+    private List<int> days = Enumerable.Range(1, daysInMonth).ToList();
+
+    private List<HabitList> listOfHabits = new List<HabitList>();
+    private List<Habit> Habits = new List<Habit>();
+    private string newHabit = "";
+    //private DateTime selectedDate = DateTime.Now;
+    private Boolean isComplete = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        listOfHabits = await habitService.GetAllHabitsList();
+        Habits = await habitService.GetAllHabits();
+    }
+
+    public async Task AddHabit()
+    {
+        HabitList habitList = new HabitList() { HabitType = newHabit};
+        await habitService.AddHabit(habitList);
+    }
+
+    // private async Task UpdateHabit()
+    // {
+    //     int habitId = 0;
+    //     Habit habit = new Habit() { HabitType = newHabit, Date = DateTime.Now, IsCompleted = isComplete };
+    //     await habitService.UpdateHabit(habitId, habit);
+    // }
+
+    private async Task UpdateHabit(int habitId, bool isChecked)
+    {
+        var habit = Habits.FirstOrDefault(h => h.Id == habitId);
+        if (habit != null)
+        {
+            habit.IsCompleted = isChecked;
+            await habitService.UpdateHabit(habitId, habit);
+            Habits = await habitService.GetAllHabits(); // Refresh data
+        }
+    }
+
+
+
+    // public async Task HabitLog(int id, int day)
+    // {
+    //     int month = DateTime.Now.Month;
+    //     int year = DateTime.Now.Year;
+    //     DateTime checkedDate = DateTime.Parse($"{day}/{month}/{year}");
+
+    //     string _habitType = listOfHabits.Where(fi => fi.Id == id).Select(y => y.HabitType).FirstOrDefault();
+    //     Habit habit = new Habit() { HabitType = _habitType, Date = checkedDate, IsCompleted = isComplete };
+    //     await habitService.HabitLog(habit);
+    // }
+
+    public async Task HabitLog(int id, int day, bool isChecked)
+    {
+        DateTime checkedDate = new(DateTime.Now.Year, DateTime.Now.Month, day);
+        string _habitType = listOfHabits.FirstOrDefault(fi => fi.Id == id)?.HabitType ?? "";
+
+        Habit habit = new()
+            {
+                HabitType = _habitType,
+                Date = checkedDate,
+                IsCompleted = isChecked
+            };
+
+        await habitService.HabitLog(habit);
+        Habits = await habitService.GetAllHabits(); // Refresh UI
+    }
+
+}
+
