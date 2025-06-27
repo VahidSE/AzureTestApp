@@ -5,20 +5,18 @@ namespace AzureTestApp.Services
     public class NotesService
     {
         HttpClient client;
-        IConfiguration _configuration;
-        private readonly string? apiURL;
+        private readonly ApiPathManagement _apiPathManagement;
 
-        public NotesService(AppDbContext databaseContext, HttpClient client, IConfiguration configuration)
+        public NotesService(HttpClient client, ApiPathManagement apiPathManagement)
         {
             this.client = client;
-            _configuration = configuration;
-            apiURL = _configuration["ApiUrl"];
+            this._apiPathManagement = apiPathManagement;
         }
 
         public async Task<List<Notes>> GetAllNotes()
         {
             List<Notes> tasks = new List<Notes>();
-            string url = $"{apiURL}/api/Notes/Tasks";
+            string url = _apiPathManagement.GetAllNotes;
             var response = await client.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
@@ -29,14 +27,14 @@ namespace AzureTestApp.Services
 
         public async Task AddNotes(Notes item)
         {
-            string url = $"{apiURL}/api/Notes/AddTask";
+            string url = _apiPathManagement.AddNotes;
             var response = await client.PostAsJsonAsync(url, item);
             if (response.IsSuccessStatusCode) { }
         }
 
         public async Task updateNotes(int id, Notes item)
         {
-            string url = $"{apiURL}/api/Notes/UpdateTask?id={id}";
+            string url = _apiPathManagement.updateNotes(id);
             var response = await client.PutAsJsonAsync(url, item);
             if (response.IsSuccessStatusCode) { }
         }

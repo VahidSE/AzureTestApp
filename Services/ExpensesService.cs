@@ -7,20 +7,18 @@ namespace AzureTestApp.Services
     {
         HttpClient client;
         private AppDbContext _databaseContext;
-        IConfiguration _configuration;
-        private readonly string? apiURL;
+        private readonly ApiPathManagement _apiPathManagement;
 
-        public ExpensesService(AppDbContext databaseContext, HttpClient client, IConfiguration configuration)
+        public ExpensesService(AppDbContext databaseContext, HttpClient client, ApiPathManagement apiPathManagement)
         {
             _databaseContext = databaseContext;
             this.client = client;
-            _configuration = configuration;
-            apiURL = _configuration["ApiUrl"];
+            _apiPathManagement = apiPathManagement;
         }
         public async Task<List<Expenses>> GetAllTransactionsByMonth(int month, int year)
         {
             List<Expenses> expenses = new List<Expenses>();
-            string url = $"{apiURL}/api/Purse/GetTxByMonth?month={month}&year={year}";
+            string url = _apiPathManagement.GetAllTransactionsByMonth(month, year);
             var response = await client.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
@@ -31,7 +29,7 @@ namespace AzureTestApp.Services
         public async Task<double> GetTotalByMonth(int month, int year)
         {
             Double total = 0;
-            string url = $"{apiURL}/api/Purse/GetTotalByMonth?month={month}&year={year}";
+            string url = _apiPathManagement.GetTotalByMonth(month, year);
             var response = await client.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
@@ -42,7 +40,7 @@ namespace AzureTestApp.Services
         public async Task<List<CatageoryAmount>> GetByCatageory(int month, int year)
         {
             List<CatageoryAmount> catAmount = new List<CatageoryAmount>();
-            string url = $"{apiURL}/api/Purse/GetCatageoryWiseByMonth?month={month}&year={year}";
+            string url = _apiPathManagement.GetByCatageory(month,year);
             var response = await client.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
@@ -52,7 +50,7 @@ namespace AzureTestApp.Services
         }
         public async Task AddTransaction(Expenses expenses)
         {
-            string url = $"{apiURL}/api/Purse/AddTx";
+            string url = _apiPathManagement.AddTransaction;
             var response = await client.PostAsJsonAsync(url, expenses);
             if (response.IsSuccessStatusCode){}
         }
@@ -63,13 +61,13 @@ namespace AzureTestApp.Services
         }
         public async Task UpdateTransaction(int id, Expenses expenses)
         {
-            string url = $"{apiURL}/api/Purse/UpdateTx?id={id}";
+            string url = _apiPathManagement.UpdateTransaction(id);
             var response = await client.PutAsJsonAsync(url, expenses);
             if (response.IsSuccessStatusCode) { }
         }
         public async Task DeleteTransaction(int Id)
         {
-            string url = $"{apiURL}/api/Purse/DeleteTx?txId={Id}";
+            string url = _apiPathManagement.DeleteTransaction(Id);
             var response = await client.PutAsync(url, null);
             if (response.IsSuccessStatusCode) { }
         }

@@ -6,20 +6,17 @@ namespace AzureTestApp.Services
     public class HabitService
     {
         HttpClient client;
-        IConfiguration _configuration;
-        private readonly string? apiURL;
-
-        public HabitService(AppDbContext databaseContext, HttpClient client, IConfiguration configuration)
+        private readonly ApiPathManagement _apiPathManagement;
+        public HabitService(HttpClient client, ApiPathManagement apiPathManagement)
         {
             this.client = client;
-            _configuration = configuration;
-            apiURL = _configuration["ApiUrl"];
+            _apiPathManagement = apiPathManagement;
         }
 
         public async Task<List<Habit>> GetAllHabits()
         {
             List<Habit> tasks = new List<Habit>();
-            string url = $"{apiURL}/api/Habit/AllHabits";
+            string url = _apiPathManagement.GetAllHabits;
             var response = await client.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
@@ -31,7 +28,7 @@ namespace AzureTestApp.Services
         public async Task<List<HabitList>> GetAllHabitsList()
         {
             List<HabitList> tasks = new List<HabitList>();
-            string url = $"{apiURL}/api/Habit/AllHabitsList";
+            string url = _apiPathManagement.GetAllHabitsList;
             var response = await client.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
@@ -43,7 +40,7 @@ namespace AzureTestApp.Services
 
         public async Task AddHabit(HabitList habitsList)
         {
-            string url = $"{apiURL}/api/Habit/AddHabit";
+            string url = _apiPathManagement.AddHabit;
             var response = await client.PostAsJsonAsync(url, habitsList);
             if (response.IsSuccessStatusCode) 
             { 
@@ -52,7 +49,7 @@ namespace AzureTestApp.Services
         }
         public async Task HabitLog(Habit habit)
         {
-            string url = $"{apiURL}/api/Habit/HabitLog";
+            string url = _apiPathManagement.HabitLog;
             var response = await client.PostAsJsonAsync(url, habit);
             if (response.IsSuccessStatusCode)
             {
@@ -62,7 +59,7 @@ namespace AzureTestApp.Services
         public async Task<List<Habit>> GetStreak(int month)
         {
             List<Habit> tasks = new List<Habit>();
-            string url = $"{apiURL}/ api/Habit/GetStreak?month={month}";
+            string url = _apiPathManagement.GetStreak(month);
             var response = await client.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
@@ -73,10 +70,12 @@ namespace AzureTestApp.Services
 
         public async Task UpdateHabit(int id, Habit habit)
         {
-            string url = $"{apiURL}/api/Habit/UpdateTask?Id={id}";
+            string url = _apiPathManagement.UpdateHabit(id);
             var response = await client.PutAsJsonAsync(url, habit);
             if (response.IsSuccessStatusCode) 
-            { }
+            {
+
+            }
         }
     }
 }

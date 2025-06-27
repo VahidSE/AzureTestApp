@@ -1,0 +1,31 @@
+﻿@inject IJSRuntime JS
+
+@if (!string.IsNullOrEmpty(Message))
+{
+    <div class="alert alert-@CssClass alert-dismissible fade show fixed-top m-3 shadow" role="alert">
+        @Message
+        <button type="button" class="btn-close" @onclick="CloseAlert"></button>
+    </div>
+}
+
+@code {
+    [Parameter] public string Message { get; set; }
+    [Parameter] public string Type { get; set; } = "success"; // success, danger, warning, info
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    string CssClass => Type switch
+    {
+        "success" => "success",
+        "danger" => "danger",
+        "warning" => "warning",
+        "info" => "info",
+        _ => "secondary"
+    };
+
+    private async Task CloseAlert()
+    {
+        Message = string.Empty;
+        await OnClose.InvokeAsync();
+    }
+}
+

@@ -1,0 +1,41 @@
+﻿@page "/login"
+@inject AuthService Auth
+@inject NavigationManager Nav
+@rendermode InteractiveServer
+
+<div>
+    <h3>Register/Login</h3>
+    <span>Are you new user? </span><input type="checkbox" @bind="isNew"/>
+    <input @bind="username" placeholder="Username" />
+    <input @bind="password" type="password" placeholder="Password" />
+    @if (isNew)
+    {
+        <button @onclick="HandleRegister">Register</button>
+    }
+    else
+    {
+        <button @onclick="HandleLogin">Login</button>
+    }
+</div>
+
+
+@code {
+    string username = "", password = "";
+    bool isNew = false;
+  
+    void HandleLogin()
+    {
+        // if (await Auth.LoginAsync(username, password))
+        //     Nav.NavigateTo("/dashboard");
+        // else
+        //     Console.WriteLine("Login failed");
+    }
+
+    void HandleRegister()
+    {
+        // if (await Auth.LoginAsync(username, password))
+        //     Nav.NavigateTo("/dashboard");
+        // else
+        //     Console.WriteLine("Login failed");
+    }
+}

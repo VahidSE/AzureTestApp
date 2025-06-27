@@ -1,5 +1,6 @@
 using AzureTestApp;
 using AzureTestApp.Components;
+using AzureTestApp.Models;
 using AzureTestApp.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +19,9 @@ builder.Services.AddScoped<ExpensesService>();
 builder.Services.AddScoped<NotesService>();
 builder.Services.AddSingleton<ProfileData>();
 builder.Services.AddScoped<HabitService>();
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddSingleton<ApiPathManagement>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
