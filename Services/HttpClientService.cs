@@ -15,7 +15,7 @@ namespace AzureTestApp.Services
             _apiPathManagement = apiPathManagement;
         }
 
-        public async Task<HttpClient> GetToken(string username, string password)
+        public async Task<LoginResponse> GetToken(string username, string password)
         {
             string token = string.Empty;
             string url = _apiPathManagement.GetToken;
@@ -26,10 +26,15 @@ namespace AzureTestApp.Services
 
             var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
             token = result?.Token;
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            return client;
+            if (token != "")
+                result.Username = username;
+
+            return result;
         }
 
-        private class LoginResponse { public string Token { get; set; } = ""; }
+        public class LoginResponse { 
+            public string Token { get; set; } = "";
+            public string Username { get; set; }
+        }
     }
 }

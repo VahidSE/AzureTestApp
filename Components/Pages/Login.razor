@@ -1,7 +1,9 @@
-﻿@page "/login"
+﻿@page "/"
 @inject AuthService Auth
 @inject NavigationManager Nav
 @rendermode InteractiveServer
+@inject HttpClientService clientService
+@inject ProtectedSessionStorage Session
 
 <div>
     <h3>Register/Login</h3>
@@ -22,13 +24,15 @@
 @code {
     string username = "", password = "";
     bool isNew = false;
-  
-    void HandleLogin()
+
+    async void HandleLogin()
     {
-        // if (await Auth.LoginAsync(username, password))
-        //     Nav.NavigateTo("/dashboard");
-        // else
-        //     Console.WriteLine("Login failed");
+        HttpClientService.LoginResponse token = await clientService.GetToken(username, password);
+        if (!String.IsNullOrEmpty(token.Token))
+        {
+            await Session.SetAsync("authToken", token.Token); // store token in session
+            await Session.SetAsync("authUsername", token.Username);
+        }
     }
 
     void HandleRegister()

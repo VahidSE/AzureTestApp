@@ -1,5 +1,7 @@
 ﻿using AzureTestApp.Models;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using System.Collections.Generic;
+using System.Net.Http.Headers;
 
 namespace AzureTestApp.Services
 {
@@ -8,15 +10,26 @@ namespace AzureTestApp.Services
         HttpClient client;
         private AppDbContext _databaseContext;
         private readonly ApiPathManagement _apiPathManagement;
+        private readonly ProtectedSessionStorage _session;
+  
 
-        public ExpensesService(AppDbContext databaseContext, HttpClient client, ApiPathManagement apiPathManagement)
+        public ExpensesService(AppDbContext databaseContext, HttpClient client, ApiPathManagement apiPathManagement, ProtectedSessionStorage session)
         {
             _databaseContext = databaseContext;
             this.client = client;
             _apiPathManagement = apiPathManagement;
+            _session = session;
+        }
+
+        private async void SetClientWithHeader()
+        {
+            //var tokenResult = await _session.GetAsync<string>("authToken");
+            //var token = tokenResult.Success ? tokenResult.Value : null;
+            //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _session.Token);
         }
         public async Task<List<Expenses>> GetAllTransactionsByMonth(int month, int year)
         {
+            SetClientWithHeader();
             List<Expenses> expenses = new List<Expenses>();
             string url = _apiPathManagement.GetAllTransactionsByMonth(month, year);
             var response = await client.GetAsync(url);
@@ -28,6 +41,7 @@ namespace AzureTestApp.Services
         }
         public async Task<double> GetTotalByMonth(int month, int year)
         {
+            SetClientWithHeader();
             Double total = 0;
             string url = _apiPathManagement.GetTotalByMonth(month, year);
             var response = await client.GetAsync(url);
@@ -39,6 +53,7 @@ namespace AzureTestApp.Services
         }
         public async Task<List<CatageoryAmount>> GetByCatageory(int month, int year)
         {
+            SetClientWithHeader();
             List<CatageoryAmount> catAmount = new List<CatageoryAmount>();
             string url = _apiPathManagement.GetByCatageory(month,year);
             var response = await client.GetAsync(url);
@@ -50,6 +65,7 @@ namespace AzureTestApp.Services
         }
         public async Task AddTransaction(Expenses expenses)
         {
+            SetClientWithHeader();
             string url = _apiPathManagement.AddTransaction;
             var response = await client.PostAsJsonAsync(url, expenses);
             if (response.IsSuccessStatusCode){}
@@ -61,12 +77,14 @@ namespace AzureTestApp.Services
         }
         public async Task UpdateTransaction(int id, Expenses expenses)
         {
+            SetClientWithHeader();
             string url = _apiPathManagement.UpdateTransaction(id);
             var response = await client.PutAsJsonAsync(url, expenses);
             if (response.IsSuccessStatusCode) { }
         }
         public async Task DeleteTransaction(int Id)
         {
+            SetClientWithHeader();
             string url = _apiPathManagement.DeleteTransaction(Id);
             var response = await client.PutAsync(url, null);
             if (response.IsSuccessStatusCode) { }
