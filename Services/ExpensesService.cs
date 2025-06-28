@@ -21,15 +21,10 @@ namespace AzureTestApp.Services
             _session = session;
         }
 
-        private async void SetClientWithHeader()
+        public async Task<List<Expenses>> GetAllTransactionsByMonth(int month, int year, string token)
         {
-            //var tokenResult = await _session.GetAsync<string>("authToken");
-            //var token = tokenResult.Success ? tokenResult.Value : null;
-            //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _session.Token);
-        }
-        public async Task<List<Expenses>> GetAllTransactionsByMonth(int month, int year)
-        {
-            SetClientWithHeader();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
             List<Expenses> expenses = new List<Expenses>();
             string url = _apiPathManagement.GetAllTransactionsByMonth(month, year);
             var response = await client.GetAsync(url);
@@ -39,9 +34,10 @@ namespace AzureTestApp.Services
             }
             return expenses;
         }
-        public async Task<double> GetTotalByMonth(int month, int year)
+        public async Task<double> GetTotalByMonth(int month, int year,string token)
         {
-            SetClientWithHeader();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
             Double total = 0;
             string url = _apiPathManagement.GetTotalByMonth(month, year);
             var response = await client.GetAsync(url);
@@ -51,9 +47,11 @@ namespace AzureTestApp.Services
             }
             return total;
         }
-        public async Task<List<CatageoryAmount>> GetByCatageory(int month, int year)
+        public async Task<List<CatageoryAmount>> GetByCatageory(int month, int year, string token)
         {
-            SetClientWithHeader();
+           
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
             List<CatageoryAmount> catAmount = new List<CatageoryAmount>();
             string url = _apiPathManagement.GetByCatageory(month,year);
             var response = await client.GetAsync(url);
@@ -65,7 +63,10 @@ namespace AzureTestApp.Services
         }
         public async Task AddTransaction(Expenses expenses)
         {
-            SetClientWithHeader();
+            var tokenResult = await _session.GetAsync<string>("authToken");
+            var token = tokenResult.Success ? tokenResult.Value : null;
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenResult.Value);
+
             string url = _apiPathManagement.AddTransaction;
             var response = await client.PostAsJsonAsync(url, expenses);
             if (response.IsSuccessStatusCode){}
@@ -77,14 +78,20 @@ namespace AzureTestApp.Services
         }
         public async Task UpdateTransaction(int id, Expenses expenses)
         {
-            SetClientWithHeader();
+            var tokenResult = await _session.GetAsync<string>("authToken");
+            var token = tokenResult.Success ? tokenResult.Value : null;
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenResult.Value);
+
             string url = _apiPathManagement.UpdateTransaction(id);
             var response = await client.PutAsJsonAsync(url, expenses);
             if (response.IsSuccessStatusCode) { }
         }
         public async Task DeleteTransaction(int Id)
         {
-            SetClientWithHeader();
+            var tokenResult = await _session.GetAsync<string>("authToken");
+            var token = tokenResult.Success ? tokenResult.Value : null;
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenResult.Value);
+
             string url = _apiPathManagement.DeleteTransaction(Id);
             var response = await client.PutAsync(url, null);
             if (response.IsSuccessStatusCode) { }

@@ -56,11 +56,22 @@
 @code {
     private List<Notes> tasks = new();
     private string newTaskTitle = "";
+    private bool _initialized = false;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        tasks = await notesService.GetAllNotes();
+        if (firstRender && !_initialized)
+        {
+            _initialized = true;
+            tasks = await notesService.GetAllNotes();
+            StateHasChanged(); // Refresh UI after async load
+        }
     }
+
+    // protected override async Task OnInitializedAsync()
+    // {
+       
+    // }
 
     private async Task AddTask()
     {

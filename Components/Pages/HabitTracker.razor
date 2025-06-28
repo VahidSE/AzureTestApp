@@ -1,6 +1,7 @@
 ﻿@page "/habit"
 @rendermode InteractiveServer
 @inject HabitService habitService
+@inject ProtectedSessionStorage Session
 
 <h4>
     Habits - @DateTime.Now.ToString("MMMM")
@@ -64,11 +65,18 @@
     private string newHabit = "";
     //private DateTime selectedDate = DateTime.Now;
     private Boolean isComplete = false;
+    private bool _initialized = false;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        listOfHabits = await habitService.GetAllHabitsList();
-        Habits = await habitService.GetAllHabits();
+        if (firstRender && !_initialized)
+        {
+            _initialized = true;
+            //var sessionKey = await Session.GetAsync<string>("authToken");
+            listOfHabits = await habitService.GetAllHabitsList();
+            Habits = await habitService.GetAllHabits();
+            StateHasChanged(); // Refresh UI after async load
+        }
     }
 
     public async Task AddHabit()
@@ -76,13 +84,6 @@
         HabitList habitList = new HabitList() { HabitType = newHabit};
         await habitService.AddHabit(habitList);
     }
-
-    // private async Task UpdateHabit()
-    // {
-    //     int habitId = 0;
-    //     Habit habit = new Habit() { HabitType = newHabit, Date = DateTime.Now, IsCompleted = isComplete };
-    //     await habitService.UpdateHabit(habitId, habit);
-    // }
 
     private async Task UpdateHabit(int habitId, bool isChecked)
     {
@@ -94,19 +95,6 @@
             Habits = await habitService.GetAllHabits(); // Refresh data
         }
     }
-
-
-
-    // public async Task HabitLog(int id, int day)
-    // {
-    //     int month = DateTime.Now.Month;
-    //     int year = DateTime.Now.Year;
-    //     DateTime checkedDate = DateTime.Parse($"{day}/{month}/{year}");
-
-    //     string _habitType = listOfHabits.Where(fi => fi.Id == id).Select(y => y.HabitType).FirstOrDefault();
-    //     Habit habit = new Habit() { HabitType = _habitType, Date = checkedDate, IsCompleted = isComplete };
-    //     await habitService.HabitLog(habit);
-    // }
 
     public async Task HabitLog(int id, int day, bool isChecked)
     {

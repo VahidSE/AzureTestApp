@@ -1,5 +1,6 @@
 ﻿using AzureTestApp.Models;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using System.Net.Http.Headers;
 
 namespace AzureTestApp.Services
 {
@@ -15,16 +16,12 @@ namespace AzureTestApp.Services
             _session = session;
         }
 
-        private async void SetClientWithHeader()
-        {
-            //var tokenResult = await _session.GetAsync<string>("authToken");
-            //var token = tokenResult.Success ? tokenResult.Value : null;
-            //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _session.Token);
-        }
-
         public async Task<List<Notes>> GetAllNotes()
         {
-            SetClientWithHeader();
+            var tokenResult = await _session.GetAsync<string>("authToken");
+            var token = tokenResult.Success ? tokenResult.Value : null;
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenResult.Value);
+
             List<Notes> tasks = new List<Notes>();
             string url = _apiPathManagement.GetAllNotes;
             var response = await client.GetAsync(url);
@@ -37,7 +34,11 @@ namespace AzureTestApp.Services
 
         public async Task AddNotes(Notes item)
         {
-            SetClientWithHeader();
+            var tokenResult = await _session.GetAsync<string>("authToken");
+            var token = tokenResult.Success ? tokenResult.Value : null;
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenResult.Value);
+
+
             string url = _apiPathManagement.AddNotes;
             var response = await client.PostAsJsonAsync(url, item);
             if (response.IsSuccessStatusCode) { }
@@ -45,7 +46,10 @@ namespace AzureTestApp.Services
 
         public async Task updateNotes(int id, Notes item)
         {
-            SetClientWithHeader();
+            var tokenResult = await _session.GetAsync<string>("authToken");
+            var token = tokenResult.Success ? tokenResult.Value : null;
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenResult.Value);
+
             string url = _apiPathManagement.updateNotes(id);
             var response = await client.PutAsJsonAsync(url, item);
             if (response.IsSuccessStatusCode) { }
