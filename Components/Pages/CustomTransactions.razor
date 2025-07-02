@@ -2,6 +2,7 @@
 @using AzureTestApp.Services
 @inject ExpensesService expService
 @inject ProtectedSessionStorage Session
+@rendermode InteractiveServer
 
 <h3>Dashboard</h3>
 <hr/>
@@ -58,46 +59,39 @@
     double TotalMoneySpent = 0;
     List<CatageoryAmount> catAmounts = new List<CatageoryAmount>();
     private bool _initialized = false;
-
+    
     protected async override Task OnInitializedAsync()
     {
         yearsList = expService.GetYears();
         monthDict = expService.GetMonths();
-
-        // var tokenResult = await Session.GetAsync<string>("authToken");
-        // var token = tokenResult.Success ? tokenResult.Value : null;
-
-        // expenseList = await expService.GetAllTransactionsByMonth(DateTime.Now.Month, DateTime.Now.Year, token);
-        // TotalMoneySpent = await expService.GetTotalByMonth(DateTime.Now.Month, DateTime.Now.Year, token);
-        // catAmounts = await expService.GetByCatageory(DateTime.Now.Month, DateTime.Now.Year, token);
-
-
     }
 
-    // protected async override Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     if (firstRender && !_initialized)
-    //     {
-    //         _initialized = true;
-    //         var tokenResult = await Session.GetAsync<string>("authToken");
-    //         var token = tokenResult.Success ? tokenResult.Value : null;
+    
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_initialized)
+        {
+            _initialized = true;
+           
+            // var tokenResult = await Session.GetAsync<string>("authToken");
+            // var token = tokenResult.Success ? tokenResult.Value : null;
 
-    //         expenseList = await expService.GetAllTransactionsByMonth(DateTime.Now.Month, DateTime.Now.Year, token);
-    //         TotalMoneySpent = await expService.GetTotalByMonth(DateTime.Now.Month, DateTime.Now.Year, token);
-    //         catAmounts = await expService.GetByCatageory(DateTime.Now.Month, DateTime.Now.Year, token);
-    //         StateHasChanged(); // Refresh UI after async load
-    //     }
-    // }
+            expenseList = await expService.GetAllTransactionsByMonth(DateTime.Now.Month, DateTime.Now.Year);
+            TotalMoneySpent = await expService.GetTotalByMonth(DateTime.Now.Month, DateTime.Now.Year);
+            catAmounts = await expService.GetByCatageory(DateTime.Now.Month, DateTime.Now.Year);
+            StateHasChanged(); // Refresh UI after async load
+        }
+    }
 
     public async Task HandleSearch()
     {
-        var tokenResult = await Session.GetAsync<string>("authToken");
-        var token = tokenResult.Success ? tokenResult.Value : null;
+        if (!_initialized)
+            return;
 
         var data = formData;
-        expenseList = await expService.GetAllTransactionsByMonth(formData.MonthFilter, formData.YearFilter, token);
-        TotalMoneySpent = await expService.GetTotalByMonth(formData.MonthFilter, formData.YearFilter, token);
-        catAmounts = await expService.GetByCatageory(formData.MonthFilter, formData.YearFilter, token);
+        expenseList = await expService.GetAllTransactionsByMonth(formData.MonthFilter, formData.YearFilter);
+        TotalMoneySpent = await expService.GetTotalByMonth(formData.MonthFilter, formData.YearFilter);
+        catAmounts = await expService.GetByCatageory(formData.MonthFilter, formData.YearFilter);
     }
 }
 

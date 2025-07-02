@@ -21,8 +21,10 @@ namespace AzureTestApp.Services
             _session = session;
         }
 
-        public async Task<List<Expenses>> GetAllTransactionsByMonth(int month, int year, string token)
+        public async Task<List<Expenses>> GetAllTransactionsByMonth(int month, int year)
         {
+            var tokenResult = await _session.GetAsync<string>("authToken");
+            var token = tokenResult.Success ? tokenResult.Value : null;
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             List<Expenses> expenses = new List<Expenses>();
@@ -34,8 +36,10 @@ namespace AzureTestApp.Services
             }
             return expenses;
         }
-        public async Task<double> GetTotalByMonth(int month, int year,string token)
+        public async Task<double> GetTotalByMonth(int month, int year)
         {
+            var tokenResult = await _session.GetAsync<string>("authToken");
+            var token = tokenResult.Success ? tokenResult.Value : null;
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             Double total = 0;
@@ -47,9 +51,10 @@ namespace AzureTestApp.Services
             }
             return total;
         }
-        public async Task<List<CatageoryAmount>> GetByCatageory(int month, int year, string token)
+        public async Task<List<CatageoryAmount>> GetByCatageory(int month, int year)
         {
-           
+            var tokenResult = await _session.GetAsync<string>("authToken");
+            var token = tokenResult.Success ? tokenResult.Value : null;
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             List<CatageoryAmount> catAmount = new List<CatageoryAmount>();
