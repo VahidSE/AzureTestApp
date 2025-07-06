@@ -1,0 +1,24 @@
+﻿@page "/logout"
+@using Microsoft.AspNetCore.Components.Authorization
+@inject ProtectedSessionStorage Session
+@inject NavigationManager Nav
+@rendermode InteractiveServer
+
+<h3>Logout</h3>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Session.DeleteAsync("authToken");
+            await Session.DeleteAsync("authUsername");
+
+            // Clear the authentication state
+            //await AuthenticationStateProvider.SetAuthenticationState(Task.FromResult(new AuthenticationState(new ClaimsPrincipal())));
+
+            // Redirect to the login page
+            Nav.NavigateTo("/");
+        }
+    }
+}
