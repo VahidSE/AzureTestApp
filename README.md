@@ -18,8 +18,7 @@
 
 | Login | Dashboard | Notes | Habits |
 |-------|-----------|-------|-------|
-| ![Login](screenshots/login-registration.png) | ![Dashboard](screenshots/dashboard.png) | ![Notes](screenshots/tasks.png) |
-![Habits] (screenshots/habits.png) |
+| ![Login](screenshots/loginregistration.png) | ![Dashboard](screenshots/dashboard.png) | ![Notes](screenshots/tasks.png) | ![Habits](screenshots/tasks.png) | 
 
 ---
 
